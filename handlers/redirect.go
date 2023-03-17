@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -42,30 +43,69 @@ func GetRedirectHandler() Handler {
 func requestForAccessToken(code string) (*http.Response, error) {
 	httpClient := http.Client{}
 
-	reqURL := fmt.Sprintf("https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s", clientID, clientSecret, code)
-	req, err := http.NewRequest(http.MethodPost, reqURL, nil)
+	// for Github
+	//reqURL := fmt.Sprintf("https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s", clientID, clientSecret, code)
+
+	data := map[string]string{
+		"client_id":     clientID,
+		"client_secret": clientSecret,
+		"code":          code,
+		"grant_type":    "authorization_code",
+		"redirect_uri":  "http://localhost:8080/oauth/redirect", // same uri in the index.html file
+	}
+	jsonBody, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+
+	// For Gitea
+	reqURL := fmt.Sprintf("http://localhost:3000/login/oauth/access_token")
+	fmt.Printf("reqURL = %s \n", reqURL)
+	req, err := http.NewRequest(http.MethodPost, reqURL, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		fmt.Fprintf(os.Stdout, "could not create HTTP request: %v", err)
 		panic(err)
 	}
 	// We set this header since we want the response
 	// as JSON
+	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("accept", "application/json")
+	req.Header.Set("accept", "application/x-www-form-urlencoded")
 
 	return httpClient.Do(req)
 }
 
 func decodeResponseBodyToGetToken(w http.ResponseWriter, res *http.Response) {
-	type OAuthAccessResponse struct {
-		AccessToken string `json:"access_token"`
-	}
+	//
+	//data, err := io.ReadAll(res.Body)
+	//if err != nil {
+	//	return
+	//}
+	//fmt.Printf(">>>>>>>>  code: %v, response: %s \n", res.StatusCode, string(data))
 
-	var t OAuthAccessResponse
+	//type GithubResponse struct {
+	//	AccessToken string `json:"access_token"`
+	//}
+	//var t GithubResponse
+	//if err := json.NewDecoder(res.Body).Decode(&t); err != nil {
+	//	fmt.Fprintf(os.Stdout, "could not parse JSON response: %v", err)
+	//	w.WriteHeader(http.StatusBadRequest)
+	//	return
+	//}
+
+	type GiteaResponse struct {
+		AccessToken  string `json:"access_token"`
+		TokenType    string `json:"token_type"`
+		ExpiresIn    int    `json:"expires_in"`
+		RefreshToken string `json:"refresh_token"`
+	}
+	var t GiteaResponse
 	if err := json.NewDecoder(res.Body).Decode(&t); err != nil {
 		fmt.Fprintf(os.Stdout, "could not parse JSON response: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
 	// curl https://api.github.com/user/repos -H "Authorization: Bearer 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"
 	fmt.Println("AccessToken : ", t.AccessToken)
 
