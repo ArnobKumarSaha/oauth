@@ -2,10 +2,27 @@ package handlers
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
 )
+
+var (
+	clientID     string
+	clientSecret string
+)
+
+func init() {
+	clientID = os.Getenv("CLIENT_ID")
+	clientSecret = os.Getenv("CLIENT_SECRET")
+
+	flag.StringVar(&clientID, "client-id", clientID, "client ID")
+	flag.StringVar(&clientSecret, "client-secret", clientSecret, "client Secret")
+	flag.Parse()
+	fmt.Println("==>", clientID, clientSecret)
+
+}
 
 func GetRedirectHandler() Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -21,11 +38,6 @@ func GetRedirectHandler() Handler {
 		decodeResponseBodyToGetToken(w, res)
 	}
 }
-
-const (
-	clientID     = "a62ed3c4435f1b59472b"
-	clientSecret = "65d3a3a199fd5c8a64063de90b7f438cde6277c7"
-)
 
 func requestForAccessToken(code string) (*http.Response, error) {
 	httpClient := http.Client{}
