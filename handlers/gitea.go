@@ -9,6 +9,7 @@ import (
 )
 
 type Gitea struct {
+	Client ClientDetails
 }
 
 var _ HandlerGetter = &Gitea{}
@@ -17,8 +18,8 @@ func (g *Gitea) requestForAccessToken(code string) (*http.Response, error) {
 	httpClient := http.Client{}
 
 	data := map[string]string{
-		"client_id":     clientID,
-		"client_secret": clientSecret,
+		"client_id":     g.Client.ID,
+		"client_secret": g.Client.Secret,
 		"code":          code,
 		"grant_type":    "authorization_code",
 		"redirect_uri":  "http://localhost:8080/oauth/redirect", // same uri in the index.html file

@@ -8,6 +8,7 @@ import (
 )
 
 type Github struct {
+	Client ClientDetails
 }
 
 var _ HandlerGetter = &Github{}
@@ -15,7 +16,7 @@ var _ HandlerGetter = &Github{}
 func (gh *Github) requestForAccessToken(code string) (*http.Response, error) {
 	httpClient := http.Client{}
 
-	reqURL := fmt.Sprintf("https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s", clientID, clientSecret, code)
+	reqURL := fmt.Sprintf("https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s", gh.Client.ID, gh.Client.Secret, code)
 
 	fmt.Printf("reqURL = %s \n", reqURL)
 	req, err := http.NewRequest(http.MethodPost, reqURL, nil)

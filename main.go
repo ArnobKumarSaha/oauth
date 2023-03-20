@@ -1,17 +1,46 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/Arnobkumarsaha/oauth/handlers"
 	"net/http"
+	"os"
+	"strings"
 )
 
-func main() {
+var (
+	cl         handlers.ClientDetails
+	authServer string
+)
 
+func init() {
+	cl.ID = os.Getenv("CLIENT_ID")
+	cl.Secret = os.Getenv("CLIENT_SECRET")
+	authServer = os.Getenv("AUTH_SERVER")
+
+	flag.StringVar(&cl.ID, "client-id", cl.ID, "client ID")
+	flag.StringVar(&cl.Secret, "client-secret", cl.Secret, "client Secret")
+	flag.StringVar(&authServer, "auth-server", authServer, "Available values : Github, Gitea")
+	flag.Parse()
+	fmt.Printf("==> %v, %v, %v \n", cl.ID, cl.Secret, authServer)
+
+}
+
+// go run *.go --client-id=<> --client-secret=<> --auth-server=github
+
+func main() {
 	fs := http.FileServer(http.Dir("public"))
 	http.Handle("/", fs)
 
-	g := &handlers.Github{}
+	// determine which type to use
+	authServer = strings.ToUpper(authServer)
+	var g handlers.HandlerGetter
+	if authServer == "GITHUB" {
+		g = &handlers.Github{Client: cl}
+	} else if authServer == "GITEA" {
+		g = &handlers.Github{Client: cl}
+	}
 	http.HandleFunc("/oauth/redirect", handlers.GetRedirectHandler(g))
 	http.HandleFunc("/hello", handlers.GetHelloHandler(g))
 

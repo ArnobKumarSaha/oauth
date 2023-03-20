@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"net/http"
@@ -16,20 +15,9 @@ type HandlerGetter interface {
 	usingAccessToken(token string) (*http.Response, error)
 }
 
-var (
-	clientID     string
-	clientSecret string
-)
-
-func init() {
-	clientID = os.Getenv("CLIENT_ID")
-	clientSecret = os.Getenv("CLIENT_SECRET")
-
-	flag.StringVar(&clientID, "client-id", clientID, "client ID")
-	flag.StringVar(&clientSecret, "client-secret", clientSecret, "client Secret")
-	flag.Parse()
-	fmt.Println("==>", clientID, clientSecret)
-
+type ClientDetails struct {
+	ID     string `json:"id"`
+	Secret string `json:"secret"`
 }
 
 func readFromURL(r *http.Request, key string) string {
