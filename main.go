@@ -40,6 +40,8 @@ func main() {
 		g = &handlers.Github{Client: cl}
 	} else if authServer == "GITEA" {
 		g = &handlers.Gitea{Client: cl}
+	} else if authServer == "B3" {
+		g = &handlers.B3{Client: cl}
 	}
 	http.HandleFunc("/oauth/redirect", handlers.GetRedirectHandler(g))
 	http.HandleFunc("/hello", handlers.GetHelloHandler(g))
