@@ -71,8 +71,8 @@ func (g *B3) usingAccessToken(token string) (*http.Response, error) {
 
 		For more details: https://try.gitea.io/api/swagger#
 	*/
-	req, err := http.NewRequest(http.MethodGet, "http://bb.test:5998/user/settings", nil)
-	fmt.Println("Requesting to http://bb.test:5998/user/settings", " ----- ", err)
+	req, err := http.NewRequest(http.MethodGet, "http://api.bb.test:3003/api/v1/user", nil)
+	fmt.Println("Requesting to http://api.bb.test:3003/api/v1/user", " ----- ", err)
 	if err != nil {
 		fmt.Fprintf(os.Stdout, "could not create HTTP request: %v", err)
 		panic(err)

@@ -43,7 +43,7 @@ func (gh *Github) decodeResponseBodyToGetToken(w http.ResponseWriter, res *http.
 	}
 
 	// curl https://api.github.com/user/repos -H "Authorization: Bearer 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"
-	fmt.Println("AccessToken : ", t.AccessToken)
+	fmt.Printf("Github Response : %+v \n", t)
 
 	w.Header().Set("Location", "/hello?access_token="+t.AccessToken)
 	w.WriteHeader(http.StatusFound)

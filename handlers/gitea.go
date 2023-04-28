@@ -58,7 +58,7 @@ func (g *Gitea) decodeResponseBodyToGetToken(w http.ResponseWriter, res *http.Re
 	}
 
 	// curl https://api.Gitea.com/user/repos -H "Authorization: Bearer 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"
-	fmt.Println("AccessToken : ", t.AccessToken)
+	fmt.Printf("Gitea Response : %+v \n", t)
 
 	w.Header().Set("Location", "/hello?access_token="+t.AccessToken)
 	w.WriteHeader(http.StatusFound)
@@ -71,7 +71,7 @@ func (g *Gitea) usingAccessToken(token string) (*http.Response, error) {
 
 		For more details: https://try.gitea.io/api/swagger#
 	*/
-	req, err := http.NewRequest(http.MethodGet, "http://localhost:3000/test/first", nil)
+	req, err := http.NewRequest(http.MethodGet, "http://localhost:3000/api/v1/user", nil)
 	if err != nil {
 		fmt.Fprintf(os.Stdout, "could not create HTTP request: %v", err)
 		panic(err)
