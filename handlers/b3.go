@@ -49,6 +49,7 @@ func (g *B3) decodeResponseBodyToGetToken(w http.ResponseWriter, res *http.Respo
 		TokenType    string `json:"token_type"`
 		ExpiresIn    int    `json:"expires_in"`
 		RefreshToken string `json:"refresh_token"`
+		IDToken      string `json:"id_token"`
 	}
 	var t B3Response
 	if err := json.NewDecoder(res.Body).Decode(&t); err != nil {
